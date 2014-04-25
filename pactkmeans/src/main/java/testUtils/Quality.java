@@ -1,4 +1,4 @@
-package testkmeans;
+package testUtils;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;

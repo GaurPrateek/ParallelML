@@ -1,4 +1,4 @@
-package myproject.kmeans;
+package mapreduceKMeans;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,11 +24,11 @@ import org.apache.mahout.math.VectorWritable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
  
-public class MahoutTryIt {
+public class KMeansMapRedRun {
  
     // ---- Static
  
-    private static final Logger LOG = LoggerFactory.getLogger(MahoutTryIt.class);
+    private static final Logger LOG = LoggerFactory.getLogger(KMeansMapRedRun.class);
     private static final String BASE_PATH = "/Users/prateekgaur/Desktop";
     private static final String POINTS_PATH = BASE_PATH + "/points";
     private static final String CLUSTERS_PATH = BASE_PATH + "/clusters";
@@ -37,7 +37,7 @@ public class MahoutTryIt {
  
     public static void main(final String[] args) {
     	
-        final MahoutTryIt application = new MahoutTryIt();
+        final KMeansMapRedRun application = new KMeansMapRedRun();
  
         try {
             application.start();

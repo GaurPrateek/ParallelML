@@ -1,4 +1,4 @@
-package testkmeans;
+package datagenerator;
 
 
 
