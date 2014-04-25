@@ -26,6 +26,7 @@ public class OnePassPlan implements Program, ProgramDescription {
 
 	public static final String maxClusterSize = "parameter.MAX_CLUSTER_SIZE";
 	public static final String kappa = "parameter.KAPPA";
+	  public static final float INVALID_DISTANCE_CUTOFF = -1;
 
 	public static final String facilityCostIncrement = "parameter.MAX_FACILITY_COST_INCREMENT";
 	public static final String finalclusters = "parameter.FINAL_CLUSTERS";
