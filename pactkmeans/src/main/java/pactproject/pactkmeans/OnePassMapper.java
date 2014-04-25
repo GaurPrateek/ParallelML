@@ -220,7 +220,6 @@ public class OnePassMapper extends MapFunction {
 	    clusterer.reindexCentroids();
 	    StringBuffer outball;
 	  
-	    Iterator< Vector> ite = sk.centroids.iterator();
 	Iterator<Centroid> itx=	clusterer.iterator();
 	
 	while( itx.hasNext() ){
