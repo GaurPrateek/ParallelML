@@ -2,16 +2,19 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>de.tuberlin.dima</groupId>
-		<artifactId>ml</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
-	</parent>
 
-	<artifactId>logreg-pact</artifactId>
+  <groupId>logreg</groupId>
+ 	<artifactId>logreg-pact</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
 	<name>Logistic Regression Implementations for Stratosphere Ozone</name>
+  <url>http://maven.apache.org</url>
+ 
 
-	<packaging>jar</packaging>
+
+
+	
     <repositories>
         <repository>
             <id>snapshots-repo</id>
@@ -22,11 +25,7 @@
     </repositories>
 	<dependencies>
 
-		<dependency>
-			<groupId>de.tuberlin.dima</groupId>
-			<artifactId>logreg-common</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
+
 
 		<dependency>
 			<groupId>eu.stratosphere</groupId>
