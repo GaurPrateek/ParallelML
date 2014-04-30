@@ -1,4 +1,4 @@
-package pactproject.pactkmeans;
+package pactKMeans;
 
 import java.io.File;
 import java.io.IOException;

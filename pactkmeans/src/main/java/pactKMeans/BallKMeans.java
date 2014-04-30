@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package pactproject.pactkmeans;
+package pactKMeans;
 
 import java.util.Collections;
 import java.util.Iterator;

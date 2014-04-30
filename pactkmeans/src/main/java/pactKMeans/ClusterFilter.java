@@ -1,4 +1,4 @@
-package pactproject.pactkmeans;
+package pactKMeans;
 
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.PathFilter;

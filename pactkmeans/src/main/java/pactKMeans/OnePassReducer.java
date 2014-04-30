@@ -1,4 +1,4 @@
-package pactproject.pactkmeans;
+package pactKMeans;
 
 
 import java.util.ArrayList;
