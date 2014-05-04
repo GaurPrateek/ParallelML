@@ -1,4 +1,4 @@
-package mapreduceKMeans;
+package mapredBatch;
 
 import java.io.File;
 import java.io.IOException;

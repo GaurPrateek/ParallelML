@@ -29,7 +29,7 @@ import com.google.common.io.Files;
 
 import eu.stratosphere.api.common.Plan;
 import eu.stratosphere.client.LocalExecutor;
-import eu.stratosphere.nephele.client.JobExecutionResult;
+
 //import eu.stratosphere.nephele.client.JobExecutionResult;
 //import eu.stratosphere.nephele.client.JobResultTest;
 
@@ -171,7 +171,7 @@ public class Util {
 	public static void executePlan(Plan toExecute) throws Exception {
 		LocalExecutor executor = new LocalExecutor();
 		executor.start();
-		JobExecutionResult runtime = executor.executePlan(toExecute);
+		eu.stratosphere.api.common.JobExecutionResult runtime = executor.executePlan(toExecute);
 		
 		System.out.println("runtime:  " + runtime);
 		executor.stop();

@@ -19,6 +19,9 @@ import eu.stratosphere.api.java.record.io.DelimitedInputFormat;
 import eu.stratosphere.types.IntValue;
 import eu.stratosphere.types.Record;
 
+import org.apache.mahout.math.RandomAccessSparseVector;
+import org.apache.mahout.math.Vector;
+
 /**
  * Generates records with an id and a and CoordVector.
  * The input format is line-based, i.e. one record is read from one line
@@ -34,7 +37,7 @@ public class PointInFormat extends DelimitedInputFormat {
 	
 	private final IntValue idInteger = new IntValue();
 	private final CoordVector point = new CoordVector();
-	
+	private final Vector points=new RandomAccessSparseVector(123);
 	private final List<Double> dimensionValues = new ArrayList<Double>();
 	private double[] pointValues = new double[0];
 	

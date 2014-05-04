@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package mapreduceKMeans;
+package mapredBatch;
 
 import java.io.IOException;
 import java.util.List;
