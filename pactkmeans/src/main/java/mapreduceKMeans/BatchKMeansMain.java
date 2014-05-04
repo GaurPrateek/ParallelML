@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -21,10 +22,10 @@ import org.apache.mahout.math.RandomAccessSparseVector;
 import org.apache.mahout.math.Vector;
 import org.apache.mahout.math.VectorWritable;
 
-public class KMeansMapRedRun {
-  public static final double[][] points = { {1, 1}, {2, 1}, {1, 2},
-                                           {2, 2}, {3, 3}, {8, 8},
-                                           {9, 8}, {8, 9}, {9, 9}};
+import de.tuberlin.dima.ml.inputreader.LibSvmVectorReader;
+
+public class BatchKMeansMain {
+
 
   public static void writePointsToFile(List<Vector> points,
                                        String fileName,
@@ -54,10 +55,27 @@ public class KMeansMapRedRun {
   }
 
   public static void main(String args[]) throws Exception {
+	  BatchKMeansMain.run(4, "/Users/prateekgaur/Desktop/a3a.txt");
+  }
+  
+  
+  // Have to check how to determine dynamically the size of RandomAccessSparseVector to initialize
+  
+  public static void run(int number_of_clusters, String filepath) throws Exception {
 
-    int k = 2;
+    int k = number_of_clusters;
 
-    List<Vector> vectors = getPoints(points);
+    Vector v;
+    List<Vector> vectors = new ArrayList<Vector>();
+  Scanner sc=  new Scanner(new File(filepath)).useDelimiter("\n");
+  while(sc.hasNext()){
+    String content = sc.next();
+    System.out.println(content);
+    v = new RandomAccessSparseVector(123);
+     LibSvmVectorReader.readVectorSingleLabel(v, content);
+     vectors.add(v);
+  }
+
 
     File testData = new File("testdata");
     if (!testData.exists()) {

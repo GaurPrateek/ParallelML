@@ -64,7 +64,7 @@ public class StreamingKMeansClustering {
 		  
 	       
 		   
-	        KMeansDriver.run(conf, inputPath, clustersPath, outputPath, 0.001, 10, true, 0, false);
+	        KMeansDriver.run(conf, inputPath, clustersPath, outputPath, null, 0.001, 10, true, 0, false);
 
 		// Read and print output values
 		ClusterHelper.readAndPrintOutputValues(conf,OUTPUT_PATH);
