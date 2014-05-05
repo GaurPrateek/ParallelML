@@ -1,4 +1,4 @@
-package ClusterUtils;
+package mapredLocalKMeans;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -13,6 +13,8 @@ import org.apache.mahout.common.HadoopUtil;
 import org.apache.mahout.math.DenseVector;
 import org.apache.mahout.math.RandomAccessSparseVector;
 import org.apache.mahout.math.Vector;
+
+import ClusterUtils.ClusterHelper;
 
 
 public class StreamingKMeansClustering {

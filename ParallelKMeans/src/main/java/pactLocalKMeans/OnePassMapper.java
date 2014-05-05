@@ -63,7 +63,7 @@ public class OnePassMapper extends MapFunction {
 
 
 
-	SKMeans sk = null;
+
 
 	double emaxClusterSize = 0;
 	double estimatedDistanceCutoff = 0;
