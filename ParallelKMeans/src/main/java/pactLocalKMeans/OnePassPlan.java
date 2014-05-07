@@ -21,7 +21,14 @@ import eu.stratosphere.types.StringValue;
  * @author PRATEEK GAUR (PGAUR19@GMAIL.COM)
  *
  */
-
+/*
+ * 
+ * currently takes svm format as input and gives 
+ * 1 0.249170375,0.775122375
+2 0.4132631944444444,0.2612536388888889
+as output
+ * 
+ */
 public class OnePassPlan implements Program, ProgramDescription {
 
 	public static final String maxClusterSize = "parameter.MAX_CLUSTER_SIZE";

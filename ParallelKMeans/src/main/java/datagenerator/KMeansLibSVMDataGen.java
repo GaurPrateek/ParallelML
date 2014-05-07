@@ -21,6 +21,15 @@ import java.text.DecimalFormat;
 import java.util.Locale;
 import java.util.Random;
 
+
+
+/*
+ * 
+ *  Data Generator for KMeans implementations handling libSVM format
+ *  
+ *  Prateek_Gaur
+ */
+
 public class KMeansLibSVMDataGen {
 	
 	static {
@@ -42,7 +51,7 @@ public class KMeansLibSVMDataGen {
 	
 	private static final DecimalFormat FORMAT = new DecimalFormat("#0.00");
 	
-	private static final char DELIMITER = '|';
+	private static final char DELIMITER = ':';
 	
 
 
@@ -131,12 +140,15 @@ public class KMeansLibSVMDataGen {
 		buffer.setLength(0);
 		
 		buffer.append(id);
-		buffer.append(DELIMITER);
+		buffer.append(" ");
 
 		// append all coordinates
 		for (int j = 0; j < coordinates.length; j++) {
+			buffer.append(j+1);
+			buffer.append(':');
 			buffer.append(FORMAT.format(coordinates[j]));
-			buffer.append('|');
+			buffer.append(' ');
+			
 		}
 		
 		out.write(buffer.toString());

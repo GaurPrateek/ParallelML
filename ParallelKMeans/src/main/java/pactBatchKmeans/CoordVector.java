@@ -107,7 +107,6 @@ public final class CoordVector implements Key {
 	}
 
 
-	
 	public void write(DataOutput out) throws IOException {
 		out.writeInt(this.coordinates.length);
 		for (int i = 0; i < this.coordinates.length; i++) {
@@ -128,7 +127,6 @@ public final class CoordVector implements Key {
 	 *         and 1 otherwise. If all coordinates are identical 0 is
 	 *         returned.
 	 */
-	
 	public int compareTo(Key o) {
 		// check if other key is also of type CoordVector
 		if (!(o instanceof CoordVector)) {

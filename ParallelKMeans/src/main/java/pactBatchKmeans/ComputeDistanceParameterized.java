@@ -38,7 +38,6 @@ public class ComputeDistanceParameterized extends MapFunction implements Seriali
 	@Override
 	public void open(Configuration parameters) throws Exception {
 		this.clusterCenters = this.getRuntimeContext().getBroadcastVariable("centers");
-		                     
 	}
 	
 	/**

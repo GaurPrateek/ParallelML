@@ -19,7 +19,15 @@ import org.apache.mahout.math.DenseVector;
 import org.apache.mahout.math.Vector;
 import org.apache.mahout.math.stats.*;
 
+/*
+ *  Currently takes input as comma seperated 
+ * 0.88309, 0.473021
+0.585292, 0.50238
 
+and output as a file containing address of files with final centres
+1 0.249170375,0.775122375
+2 0.4132631944444444,0.2612536388888889
+ */
 
 public class Quality {
 
@@ -40,7 +48,8 @@ public class Quality {
 	
 	public static Centroid textToCentroid(int key, String str)
 	{
-		String[] strArray = str.split(",");
+		String[] x=str.split(" ");
+		String[] strArray = x[1].split(",");
 		double[] dArray = new double[strArray.length];
 		for(int i=0; i<strArray.length; i++)
 		{
@@ -77,6 +86,7 @@ public class Quality {
         List<Double> daviesBouldinIndexList = new ArrayList<Double>();
         List<Double> totalCostList = new ArrayList<Double>();
         Iterator<List<Vector>> i = centersList.iterator();
+        
         while(i.hasNext()){
         	List<Vector> centers=i.next();
         	List<OnlineSummarizer> summarizerList = ClusteringUtils.summarizeClusterDistances(qualityClass.points, centers, new CosineDistanceMeasure());
@@ -91,6 +101,7 @@ public class Quality {
         
         Iterator<Double> ix= dunnIndexList.iterator();
         ps.println("Dunn Index");
+        
         while(ix.hasNext()){
         	ps.println(ix.next());
         }
