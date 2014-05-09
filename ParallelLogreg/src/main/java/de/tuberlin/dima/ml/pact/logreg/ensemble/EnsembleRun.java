@@ -1,12 +1,13 @@
-package pactLocalLogreg;
+package de.tuberlin.dima.ml.pact.logreg.ensemble;
 
 
 
 import java.io.IOException;
 
-import eu.stratosphere.api.common.JobExecutionResult;
 import eu.stratosphere.api.common.Plan;
 import eu.stratosphere.client.LocalExecutor;
+import eu.stratosphere.nephele.client.JobExecutionResult;
+
 
 
 

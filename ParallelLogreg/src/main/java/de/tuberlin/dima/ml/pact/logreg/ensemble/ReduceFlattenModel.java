@@ -1,4 +1,4 @@
-package pactLocalLogreg;
+package de.tuberlin.dima.ml.pact.logreg.ensemble;
 
 import java.util.Iterator;
 

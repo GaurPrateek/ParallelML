@@ -82,11 +82,9 @@ public static final int FLAG_DENSE = 0x01;
     this.writesLaxPrecision = writesLaxPrecision;
   }
 
- 
   public void write(DataOutput out) throws IOException {
     writeVector(out, this.vector, this.writesLaxPrecision);
   }
-
 
   public void read(DataInput in) throws IOException {
     int flags = in.readByte();

@@ -13,28 +13,21 @@
 
 package pactBatchKmeans;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import eu.stratosphere.api.common.Plan;
 import eu.stratosphere.api.common.Program;
 import eu.stratosphere.api.common.ProgramDescription;
 import eu.stratosphere.api.common.operators.BulkIteration;
 import eu.stratosphere.api.common.operators.FileDataSink;
 import eu.stratosphere.api.common.operators.FileDataSource;
-import eu.stratosphere.api.common.operators.GenericDataSink;
 import eu.stratosphere.api.java.record.operators.CrossOperator;
-import eu.stratosphere.api.java.record.operators.JoinOperator;
 import eu.stratosphere.api.java.record.operators.ReduceOperator;
-import eu.stratosphere.client.LocalExecutor;
 
 import eu.stratosphere.types.IntValue;
 
 
 public class KMeansIterative implements Program, ProgramDescription {
-
-	private static final long serialVersionUID = 1L;
-
+	
+	
 	public Plan getPlan(String... args) {
 		// parse job parameters
 		final int numSubTasks = (args.length > 0 ? Integer.parseInt(args[0]) : 1);
@@ -46,11 +39,11 @@ public class KMeansIterative implements Program, ProgramDescription {
 		// create DataSourceContract for cluster center input
 		FileDataSource initialClusterPoints = new FileDataSource(new PointInFormat(), clusterInput, "Centers");
 		initialClusterPoints.setDegreeOfParallelism(1);
-
+		
 		BulkIteration iteration = new BulkIteration("K-Means Loop");
 		iteration.setInput(initialClusterPoints);
 		iteration.setMaximumNumberOfIterations(numIterations);
-
+		
 		// create DataSourceContract for data point input
 		FileDataSource dataPoints = new FileDataSource(new PointInFormat(), dataPointInput, "Data Points");
 
@@ -72,63 +65,19 @@ public class KMeansIterative implements Program, ProgramDescription {
 				.input(findNearestClusterCenters)
 				.name("Recompute Center Positions")
 				.build();
-		JoinOperator termination = JoinOperator.builder(new JoinOldAndNew(), IntValue.class, 0, 0)
-				.input1(iteration.getPartialSolution())
-				.input2(recomputeClusterCenter)
-				.name("Join Old and New")
-				.build();
-
-		iteration.setTerminationCriterion(termination);
 		iteration.setNextPartialSolution(recomputeClusterCenter);
 
-		// create DataSourceContract for data point input
-		FileDataSource dataPoints2 = new FileDataSource(new PointInFormat(), dataPointInput, "Data Points 2");
-
-		// compute distance of points to final clusters 
-		CrossOperator computeFinalDistance = CrossOperator.builder(new ComputeDistance())
-				.input1(dataPoints2)
-				.input2(iteration)
-				.name("Compute Final Distances")
-				.build();
-
-		// find nearest final cluster for point
-		ReduceOperator findNearestFinalCluster = ReduceOperator.builder(new FindNearestCenter(), IntValue.class, 0)
-				.input(computeFinalDistance)
-				.name("Find Nearest Final Centers")
-				.build();
-
 		// create DataSinkContract for writing the new cluster positions
-		FileDataSink finalClusters = new FileDataSink(new PointOutFormat(), output+"/centers", iteration, "Cluster Positions");
-
-		// write assigned clusters
-		FileDataSink clusterAssignments = new FileDataSink(new PointOutFormat(), output+"/points", findNearestFinalCluster, "Cluster Assignments");
-
-		List<GenericDataSink> sinks = new ArrayList<GenericDataSink>();
-		sinks.add(finalClusters);
-		sinks.add(clusterAssignments);
+		FileDataSink finalResult = new FileDataSink(new PointOutFormat(), output, iteration, "New Center Positions");
 
 		// return the PACT plan
-		Plan plan = new Plan(sinks, "Iterative KMeans");
+		Plan plan = new Plan(finalResult, "Iterative KMeans");
 		plan.setDefaultParallelism(numSubTasks);
 		return plan;
 	}
 
+	
 	public String getDescription() {
 		return "Parameters: <numSubStasks> <dataPoints> <clusterCenters> <output> <numIterations>";
-	}
-
-	public static void main(String[] args) throws Exception {
-		KMeansIterative kmi = new KMeansIterative();
-
-		if (args.length < 5) {
-			System.err.println(kmi.getDescription());
-			System.exit(1);
-		}
-
-		Plan plan = kmi.getPlan(args);
-
-		// This will execute the kMeans clustering job embedded in a local context.
-		LocalExecutor.execute(plan);
-
 	}
 }

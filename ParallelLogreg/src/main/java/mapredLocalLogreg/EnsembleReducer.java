@@ -14,7 +14,6 @@ import org.apache.mahout.math.VectorWritable;
 
 import Utils.AdaptiveLogger;
 import Utils.VectorSingleLabeledWritable;
-import de.tuberlin.dima.ml.inputreader.LibSvmVectorReader;
 import de.tuberlin.dima.ml.validation.OnlineAccuracy;
 
 public class EnsembleReducer extends Reducer<IntWritable, VectorSingleLabeledWritable, IntWritable, VectorWritable> {

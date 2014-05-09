@@ -1,4 +1,4 @@
-package pactLocalLogreg;
+package de.tuberlin.dima.ml.pact.logreg.ensemble;
 
 import de.tuberlin.dima.ml.pact.logreg.eval.CrossEval;
 import de.tuberlin.dima.ml.pact.logreg.eval.ReduceEvalSum;
@@ -36,12 +36,10 @@ import eu.stratosphere.types.StringValue;
  */
 public class EnsembleJob implements Program, ProgramDescription {
   
-
   public String getDescription() {
     return "Parameters: [numPartitions] [inputPathTrain] [inputPathTest] [outputPath] [numFeatures] [runValidation (0 or 1)]";
   }
   
-
   public Plan getPlan(String... args) {
     
     // parse job parameters

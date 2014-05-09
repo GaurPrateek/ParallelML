@@ -22,7 +22,7 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/Users/prateekgaur/.m2/repository/org/apache/mahout/mahout-core/0.8/mahout-core-0.8.jar" sourcepath="/Users/prateekgaur/.m2/repository/org/apache/mahout/mahout-core/0.8/mahout-core-0.8-sources.jar">
+	<classpathentry exported="true" kind="lib" path="/Users/prateekgaur/.m2/repository/org/apache/mahout/mahout-core/0.8/mahout-core-0.8.jar" sourcepath="/Users/prateekgaur/.m2/repository/org/apache/mahout/mahout-core/0.8/mahout-core-0.8-sources.jar">
 		<attributes>
 			<attribute name="maven.pomderived" value="true"/>
 			<attribute name="maven.groupId" value="org.apache.mahout"/>
@@ -32,6 +32,8 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry kind="src" path="/logreg-common"/>
+	<classpathentry exported="true" kind="src" path="/logreg-common"/>
+	<classpathentry kind="lib" path="/Users/prateekgaur/Downloads/stratosphere 3/lib/log4j-1.2.16.jar"/>
+	<classpathentry kind="lib" path="/Users/prateekgaur/Downloads/stratosphere 3/lib/slf4j-api-1.4.3.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

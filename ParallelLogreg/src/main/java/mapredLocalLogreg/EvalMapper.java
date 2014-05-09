@@ -75,7 +75,7 @@ public class EvalMapper extends Mapper<IDAndLabels, VectorWritable, Text, IntPai
         IntWritable partitionId = new IntWritable();
         VectorWritable ensembleModel = new VectorWritable();
         while (reader.next(partitionId, ensembleModel)) {
-          ensembleModels.add((Vector)ensembleModel.get());
+          ensembleModels.add(ensembleModel.get());
           System.out.println("- Ensemble-Model " + partitionId.get() + ": Non zeros: " + ensembleModel.get().getNumNonZeroElements());
         }
       } finally {
