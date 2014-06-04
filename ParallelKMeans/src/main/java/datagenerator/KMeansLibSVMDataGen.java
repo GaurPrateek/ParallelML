@@ -36,9 +36,9 @@ public class KMeansLibSVMDataGen {
 		Locale.setDefault(Locale.US);
 	}
 	
-	private static final String CENTERS_FILE = "centers";
+	private static final String CENTERS_FILE = "/Users/prateekgaur/ParallelML/ParallelKMeans/src/main/java/pactBatchKmeans/centers";
 	
-	private static final String POINTS_FILE = "points";
+	private static final String POINTS_FILE = "/Users/prateekgaur/ParallelML/ParallelKMeans/src/main/java/pactBatchKmeans/points";
 	
 	private static final long DEFAULT_SEED = 4650285087650871364L;
 	

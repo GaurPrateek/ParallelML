@@ -191,15 +191,8 @@ public class OnePassMapper extends MapFunction {
 		Vector randomDenseVector;
 		String document = record.getField(0, StringValue.class).toString();
 
-//		String[] content= document.split(",");
 
-//		double[] pointArray = new double[content.length];
-
-//		for(int i=0;i<content.length;i++)
-//		{
-//			pointArray[i]=Double.parseDouble(content[i]);
-//		}
-		randomDenseVector = new RandomAccessSparseVector(123);
+		randomDenseVector = new RandomAccessSparseVector(5);
 		     LibSvmVectorReader.readVectorSingleLabel(randomDenseVector, document);
 	//	DenseVector randomDenseVector = new DenseVector(pointArray);
 		Centroid newCentroid = new Centroid(numPoints, randomDenseVector);
@@ -255,25 +248,6 @@ public class OnePassMapper extends MapFunction {
 
 			cachedCollector.collect(outPactRec);
 		}
-		/*		while( ite.hasNext() ){
-			Vector next = ite.next();
-			outball=new StringBuffer();
-
-			for(int j=0;j<next.size()-1;j++)
-			{
-				outball.append(String.valueOf(next.getQuick(j))+"#");
-			}
-			outball.append(next.getQuick(next.size()-1));
-
-
-			Record outPactRec=new Record();
-			StringValue outString=new StringValue(outball.toString());
-			IntValue one=new IntValue(1);
-
-			outPactRec.setField(0, one);
-			outPactRec.setField(1, outString);
-
-			cachedCollector.collect(outPactRec);
-		}*/
+		
 	}
 }

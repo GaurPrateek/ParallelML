@@ -50,8 +50,8 @@ public class ComputeGradientParts extends CrossFunction {
 	public void cross(Record trainingVector, Record model, Collector<Record> out) throws Exception {
 
         int y = trainingVector.getField(IDX_INPUT1_INPUT_RECORD, IntValue.class).getValue();
-		Vector x = trainingVector.getField(IDX_INPUT1_LABEL, PactVector.class).getValue();
-		Vector w = model.getField(IDX_INPUT2_MODEL, PactVector.class).getValue();
+		Vector x = trainingVector.getField(IDX_INPUT1_LABEL, PactVector.class).getValue(); //label
+		Vector w = model.getField(IDX_INPUT2_MODEL, PactVector.class).getValue();     //model
 		
 //		System.out.println("Training vector: size=" + xTrain.size() + " non-zeros=" + xTrain.getNumNonZeroElements());
 

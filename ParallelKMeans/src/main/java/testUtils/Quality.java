@@ -16,13 +16,14 @@ import org.apache.mahout.clustering.ClusteringUtils;
 import org.apache.mahout.common.distance.CosineDistanceMeasure;
 import org.apache.mahout.math.Centroid;
 import org.apache.mahout.math.DenseVector;
+import org.apache.mahout.math.RandomAccessSparseVector;
 import org.apache.mahout.math.Vector;
 import org.apache.mahout.math.stats.*;
 
+import de.tuberlin.dima.ml.inputreader.LibSvmVectorReader;
+
 /*
- *  Currently takes input as comma seperated 
- * 0.88309, 0.473021
-0.585292, 0.50238
+ *  Currently takes LibSVM format as input
 
 and output as a file containing address of files with final centres
 1 0.249170375,0.775122375
@@ -36,14 +37,11 @@ public class Quality {
 
 	public static Vector textToVector(String str)
 	{
-		String[] strArray = str.split(",");
-		double[] dArray = new double[strArray.length];
-		for(int i=0; i<strArray.length; i++)
-		{
-			dArray[i] = Double.parseDouble(strArray[i]);
-		}
-		Vector v = new DenseVector(dArray);
-		return v;
+		
+		Vector randomDenseVector = new RandomAccessSparseVector(5);
+	     LibSvmVectorReader.readVectorSingleLabel(randomDenseVector, str);
+		
+		return randomDenseVector;
 	}
 	
 	public static Centroid textToCentroid(int key, String str)
@@ -101,21 +99,28 @@ public class Quality {
         
         Iterator<Double> ix= dunnIndexList.iterator();
         ps.println("Dunn Index");
+     
         
         while(ix.hasNext()){
-        	ps.println(ix.next());
+        	Double duni=ix.next();
+        	ps.println(duni);
+        	   System.out.println("Dunn Index:"+duni);
         }
         
         ix= daviesBouldinIndexList.iterator();
         ps.println("Davies Index");
         while(ix.hasNext()){
-        	ps.println(ix.next());
+        	Double di = ix.next();
+        	ps.println(di);
+        	 System.out.println("Davies Index:"+di);
         }
         
         ix= totalCostList.iterator();
         ps.println("Total Cost");
         while(ix.hasNext()){
-        	ps.println(ix.next());
+        	Double tc = ix.next();
+        	ps.println(tc);
+        	 System.out.println("Total Cost:"+tc);
         }
         
         ps.close();

@@ -32,123 +32,120 @@ import eu.stratosphere.api.common.operators.BulkIteration;
 
 public class BatchGDPlanAssembler implements ProgramDescription {
 
-//  private static final int ECAT = 59;
-//  private static final int GCAT = 70;
-//  private static final int MCAT = 102;
 
-  private static final int INITIAL_VALUE = 0;
+	private static final int INITIAL_VALUE = 0;
 
- 
-  public Plan getPlan(String... args) {
-    // parse job parameters
-    final int numSubTasks = (args.length > 0) ? Integer.parseInt(args[0]) : 1;
-    final String inputPathTrain = (args.length > 1) ? args[1] : "";
-    final String outputPath = (args.length > 3) ? args[3] : "";
-    final int numIterations = (args.length > 4) ? Integer.parseInt(args[4]) : 1;
 
-    final String learningRate = (args.length > 6) ? args[6] : "1";
-    final int ccat = (args.length > 7) ? Integer.parseInt(args[7]) : 1;
-    final int features = (args.length > 8) ? Integer.parseInt(args[8]) : 47237;
+	public Plan getPlan(String... args) {
+		// parse job parameters
+		final int numSubTasks = (args.length > 0) ? Integer.parseInt(args[0]) : 1;
+		final String inputPathTrain = (args.length > 1) ? args[1] : "";
+		final String outputPath = (args.length > 3) ? args[3] : "";
+		final int numIterations = (args.length > 4) ? Integer.parseInt(args[4]) : 1;
 
-    // input vectors (constant path)
-    FileDataSource trainingVectors = new FileDataSource(
-        LibsvmInputFormat.class, inputPathTrain, "Input Vectors");
-    trainingVectors.setParameter(LibsvmInputFormat.CONF_KEY_POSITIVE_CLASS, ccat);
-    trainingVectors.setParameter(LibsvmInputFormat.CONF_KEY_NUM_FEATURES,
-        features);
+		final String learningRate = (args.length > 6) ? args[6] : "1";
+		final int ccat = (args.length > 7) ? Integer.parseInt(args[7]) : 1;
+		final int features = (args.length > 8) ? Integer.parseInt(args[8]) : 1000;
 
-    // initial weight
-    GenericDataSource<WeightVectorInputFormat> initialWeights = new GenericDataSource<WeightVectorInputFormat>(WeightVectorInputFormat.class);
-    initialWeights.setParameter(WeightVectorInputFormat.CONF_KEY_NUM_FEATURES, features);
-    initialWeights.setParameter(WeightVectorInputFormat.CONF_KEY_INITIAL_VALUE, INITIAL_VALUE);
+		// input vectors (constant path)
+		FileDataSource trainingVectors = new FileDataSource(
+				LibsvmInputFormat.class, inputPathTrain, "Input Vectors");
+		trainingVectors.setParameter(LibsvmInputFormat.CONF_KEY_POSITIVE_CLASS, ccat);
+		trainingVectors.setParameter(LibsvmInputFormat.CONF_KEY_NUM_FEATURES,
+				features);
 
-    BulkIteration iteration = new BulkIteration("Batch GD");
-    iteration.setInput(initialWeights);
-    iteration.setMaximumNumberOfIterations(numIterations);
-    System.out.println("NUM ITERATIONS: " + numIterations);
+		// initial weight
+		GenericDataSource<WeightVectorInputFormat> initialWeights = new GenericDataSource<WeightVectorInputFormat>(WeightVectorInputFormat.class);
+		initialWeights.setParameter(WeightVectorInputFormat.CONF_KEY_NUM_FEATURES, features);
+		initialWeights.setParameter(WeightVectorInputFormat.CONF_KEY_INITIAL_VALUE, INITIAL_VALUE);
 
-    CrossOperator computeGradientParts = CrossOperator.builder(ComputeGradientParts.class)
-        .input1(trainingVectors)
-        .input2(iteration.getPartialSolution())
-        .name("Compute Gradient Parts (Cross)")
-        .build();
+		BulkIteration iteration = new BulkIteration("Batch GD");
+		iteration.setInput(initialWeights);
+		iteration.setMaximumNumberOfIterations(numIterations);
+		System.out.println("NUM ITERATIONS: " + numIterations);
 
-    // TODO Stratosphere Bug: If we don't pass the key class and the key column,
-    // we get the unspecific error
-    // Exception in thread "main"
-    // eu.stratosphere.pact.compiler.CompilerException: Unknown local strategy:
-    // ALL_GROUP at
-    // eu.stratosphere.pact.compiler.costs.CostEstimator.costOperator(CostEstimator.java:185)
-    ReduceOperator computeGradient = ReduceOperator.builder(GradientSumUp.class, IntValue.class, 0)
-        .input(computeGradientParts)
-        .name("Sum up Gradient (Reduce)")
-        .build();
-    
-    CrossOperator applyGradient = CrossOperator.builder(ApplyGradient.class)
-        .input1(iteration.getPartialSolution())
-        .input2(computeGradient)
-        .name("Apply Gradient (Cross)")
-        .build();
-    applyGradient.setParameter(ApplyGradient.CONF_KEY_LEARNING_RATE, learningRate);
+		CrossOperator computeGradientParts = CrossOperator.builder(ComputeGradientParts.class)
+				.input1(trainingVectors)
+				.input2(iteration.getPartialSolution())
+				.name("Compute Gradient Parts (Cross)")
+				.build();
 
-    iteration.setNextPartialSolution(applyGradient);
+		// TODO Stratosphere Bug: If we don't pass the key class and the key column,
+		// we get the unspecific error
+		// Exception in thread "main"
+		// eu.stratosphere.pact.compiler.CompilerException: Unknown local strategy:
+		// ALL_GROUP at
+		// eu.stratosphere.pact.compiler.costs.CostEstimator.costOperator(CostEstimator.java:185)
+		
+		ReduceOperator computeGradient = ReduceOperator.builder(GradientSumUp.class, IntValue.class, 0)
+				.input(computeGradientParts)
+				.name("Sum up Gradient (Reduce)")
+				.build();
 
-    FileDataSink finalResult = new FileDataSink(CsvOutputFormat.class,
-        outputPath, iteration, "Output");
+		CrossOperator applyGradient = CrossOperator.builder(ApplyGradient.class)
+				.input1(iteration.getPartialSolution())
+				.input2(computeGradient)
+				.name("Apply Gradient (Cross)")
+				.build();
+		applyGradient.setParameter(ApplyGradient.CONF_KEY_LEARNING_RATE, learningRate);
 
-    CsvOutputFormat.configureRecordFormat(finalResult).recordDelimiter('\n')
-        .fieldDelimiter(' ')
-        .field(PactVector.class, 0);
+		iteration.setNextPartialSolution(applyGradient);
 
-    Plan plan = new Plan(finalResult, "BatchGD Plan");
-    plan.setDefaultParallelism(numSubTasks);
+		FileDataSink finalResult = new FileDataSink(CsvOutputFormat.class,
+				outputPath, iteration, "Output");
 
-    return plan;
-  }
+		CsvOutputFormat.configureRecordFormat(finalResult).recordDelimiter('\n')
+		.fieldDelimiter(' ')
+		.field(PactVector.class, 0);
 
-  public String getDescription() {
-    return "[numSubTasks] [inputPathTrain] [inputPathTest] [outputPath] [numIteration] [runValidation (0 or 1)] [learningRate] [positiveClass] [numFeatures]";
-  }
+		Plan plan = new Plan(finalResult, "BatchGD Plan");
+		plan.setDefaultParallelism(numSubTasks);
 
-  public static void main(String[] args) throws Exception {
-    BatchGDPlanAssembler bgd = new BatchGDPlanAssembler();
+		return plan;
+	}
 
-    String numSubTasks = "1";
-    String inputFileTrain = "file:///Users/prateekgaur/Desktop/cod-rna";
-    String inputFileTest = "file:///Users/prateekgaur/Downloads/cod-rna.t";
-    String outputFile = "file:///Users/prateekgaur/Desktop/output-pactlogreg-batch";
-    String numIterations = "5";
-    String runValidation = "0";
-    String learningRate = "0.05";
-    String[] jobArgs = { 
-        numSubTasks, 
-        inputFileTrain, 
-        inputFileTest,
-        outputFile,
-        numIterations,
-        runValidation,
-        learningRate};
-    // String[] jobArgs = { "1", "file:///home/andre/dev/logreg-repo",
-    // "file:///Users/uce/Desktop/rcv1libsvm/rcv1_topics_train.svm",
-    // "file:///Users/uce/Desktop/rcv1libsvm/rcv1_topics_train.svm",
-    // "file:///Users/uce/Desktop/rcv1libsvm/output/", "1", "0" };
-    
-    boolean runLocal = true;
-    JobRunner runner = new JobRunner();
-    if (runLocal) {
-      
-      runner.runLocal(bgd.getPlan(jobArgs));
-      
-    } else {
-      
-      String jarPath = IOUtils.getDirectoryOfJarOrClass(EnsembleJob.class)
-          + "/logreg-pact-0.0.1-SNAPSHOT-job.jar";
-      System.out.println("JAR PATH: " + jarPath);
-      runner.run(jarPath, "de.tuberlin.dima.ml.pact.logreg.batchgd.BatchGDJob", jobArgs, "", "", "", true);
-      
-    }
-    System.out.println("Job completed. Runtime=" + runner.getLastWallClockRuntime());
+	public String getDescription() {
+		return "[numSubTasks] [inputPathTrain] [inputPathTest] [outputPath] [numIteration] [runValidation (0 or 1)] [learningRate] [positiveClass] [numFeatures]";
+	}
 
-  }
+	public static void main(String[] args) throws Exception {
+		BatchGDPlanAssembler bgd = new BatchGDPlanAssembler();
+
+		String numSubTasks = "1";
+		//	String inputFileTrain = "file:///Users/prateekgaur/Desktop/cod-rna";
+		//	String inputFileTest = "file:///Users/prateekgaur/Downloads/cod-rna.t";
+		String inputFileTrain = "file:///Users/prateekgaur/Downloads/mnist";
+		String inputFileTest = "file:///Users/prateekgaur/Downloads/mnist.t";
+		String outputFile = "file:///Users/prateekgaur/ParallelML/ParallelLogreg/src/main/java/pactbatchlogreg/output-pactlogreg-batch";
+		String numIterations = "5";
+		String runValidation = "1";
+		String learningRate = "0.05";
+		String[] jobArgs = { 
+				numSubTasks, 
+				inputFileTrain, 
+				inputFileTest,
+				outputFile,
+				numIterations,
+				runValidation,
+				learningRate};
+
+
+		boolean runLocal = true;
+		JobRunner runner = new JobRunner(); 
+		if (runLocal) {
+
+			runner.runLocal(bgd.getPlan(jobArgs));
+
+		} else {
+
+			String jarPath = IOUtils.getDirectoryOfJarOrClass(EnsembleJob.class)
+					+ "/logreg-pact-0.0.1-SNAPSHOT-job.jar";
+			System.out.println("JAR PATH: " + jarPath);
+			runner.run(jarPath, "de.tuberlin.dima.ml.pact.logreg.batchgd.BatchGDJob", jobArgs, "", "", "", true);
+
+		}
+		System.out.println("Job completed. Runtime=" + runner.getLastWallClockRuntime());
+
+	}
 
 }

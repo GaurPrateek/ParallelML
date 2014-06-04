@@ -5,7 +5,9 @@ import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.mahout.math.SequentialAccessSparseVector;
 import org.apache.mahout.math.Vector;
 import org.apache.mahout.math.VectorWritable;
@@ -23,7 +25,7 @@ import Utils.HadoopUtils;
  */
 public class TrainingErrorJob extends AbstractHadoopJob {
 
-  private static String JOB_NAME = "aim3-training-error";
+  private static String JOB_NAME = "Batch-LogReg-training-error";
 
   static final int REDUCE_TASKS = 1;
 
@@ -48,7 +50,6 @@ public class TrainingErrorJob extends AbstractHadoopJob {
     this.w = new VectorWritable(weights);
   }
 
-
   public int run(String[] args) throws Exception {
     
     Job job = prepareJob(
@@ -60,8 +61,8 @@ public class TrainingErrorJob extends AbstractHadoopJob {
         DoubleWritable.class,
         NullWritable.class,
         DoubleWritable.class,
-        SequenceFileInputFormat.class,
-        SequenceFileOutputFormat.class,
+        TextInputFormat.class,
+        TextOutputFormat.class,
         inputFile,
         outputPath);
     job.setCombinerClass(TrainingErrorReducer.class);
@@ -71,7 +72,8 @@ public class TrainingErrorJob extends AbstractHadoopJob {
     cleanupOutputDirectory(outputPath);
 
     // Initial weights
-    Path cachePath = new Path(job.getConfiguration().get("hadoop.tmp.dir") + "/initial_weights");
+   // Path cachePath = new Path(job.getConfiguration().get("hadoop.tmp.dir") + "/initial_weights");
+    Path cachePath = new Path(("/Users/prateekgaur/Downloads/output-batch-logreg/iteration2/part-r-00000"));
     HadoopUtils.writeVectorToDistCache(job.getConfiguration(), this.w, cachePath);
 
     return job.waitForCompletion(true) ? 0 : 1;
@@ -92,6 +94,4 @@ public class TrainingErrorJob extends AbstractHadoopJob {
   public String getOutputPath() {
     return this.outputPath;
   }
-
-
 }

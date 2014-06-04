@@ -6,18 +6,23 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.filecache.DistributedCache;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.DoubleWritable;
+import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.NullWritable;
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.mahout.common.Pair;
 import org.apache.mahout.common.iterator.sequencefile.SequenceFileIterable;
+import org.apache.mahout.math.RandomAccessSparseVector;
 import org.apache.mahout.math.Vector;
 import org.apache.mahout.math.VectorWritable;
 
-import Utils.IDAndLabels;
+import Utils.id.IDAndLabels;
+import de.tuberlin.dima.ml.inputreader.LibSvmVectorReader;
 import de.tuberlin.dima.ml.logreg.LogRegMath;
 
+
 public class TrainingErrorMapper extends
-    Mapper<IDAndLabels, VectorWritable, NullWritable, DoubleWritable> {
+    Mapper<LongWritable, Text, NullWritable, DoubleWritable> {
   
   private int labelDimension;
 
@@ -46,12 +51,18 @@ public class TrainingErrorMapper extends
   }
 
   @Override
-  public void map(IDAndLabels key, VectorWritable value, Context context) throws IOException,
+  public void map(LongWritable key, Text value, Context context) throws IOException,
       InterruptedException {
 
-    Vector x = value.get();
-    double y = key.getLabels().get(labelDimension);
+ 
+	String line = String.valueOf(value);
 
+
+	
+	Vector x=new RandomAccessSparseVector(781);
+	int y1 = LibSvmVectorReader.readVectorSingleLabel(x, line);
+	//System.out.println(y1);
+	double y=(double)y1;
     this.trainingError.set(LogRegMath.computeSqError(x, this.w, y));
 
     context.write(NullWritable.get(), this.trainingError);

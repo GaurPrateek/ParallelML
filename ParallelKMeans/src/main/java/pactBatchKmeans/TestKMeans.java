@@ -9,14 +9,14 @@ public class TestKMeans {
   
   public static void main(String[] args) throws Exception {
     // GENERATE TEST DATA
-    String numPoints = "1000";
-    String numClusters = "5";
-    KMeansSampleDataGenerator.main(new String[] { numPoints, numClusters });
+ //   String numPoints = "1000";
+ //   String numClusters = "5";
+  //  KMeansSampleDataGenerator.main(new String[] { numPoints, numClusters });
 
     // RUN JOB
-    String dataDir = "file:///Users/qml_moon/Documents/TUB/DIMA/code/stratosphere-ml/logreg-pact/";
-    String output = "file:///Users/qml_moon/Documents/TUB/DIMA/code/output-kmeans";
-    String numSubTasks = "2";
+    String dataDir = "file:///Users/prateekgaur/ParallelML/ParallelKMeans/src/main/java/pactBatchKmeans/";
+    String output = "file:///Users/prateekgaur/ParallelML/ParallelKMeans/src/main/java/pactBatchKmeans/";
+    String numSubTasks = "1";
     String numIterations = "2";
     JobRunner runner = new JobRunner();
     // <numSubStasks> <dataPoints> <clusterCenters> <output> <numIterations>

@@ -1,9 +1,11 @@
 package mapredLocalLogreg;
 
 import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.mahout.math.VectorWritable;
 
 import Utils.AbstractHadoopJob;
@@ -45,7 +47,7 @@ public class EnsembleJob extends AbstractHadoopJob {
         EnsembleReducer.class, 
         IntWritable.class,
         VectorSingleLabeledWritable.class,
-        IntWritable.class,
+        Text.class,
         VectorWritable.class,
         TextInputFormat.class,
         SequenceFileOutputFormat.class,

@@ -31,9 +31,6 @@ public class EnsembleMapper extends Mapper<LongWritable, Text, IntWritable, Vect
 	VectorSingleLabeledWritable outputVector=new VectorSingleLabeledWritable();
 	VectorWritable outputlabel=new VectorWritable();
 
-	//private static AdaptiveLogger log = new AdaptiveLogger(
-	//		Logger.getLogger(EnsembleMapper.class.getName()), 
-	//		Level.DEBUG); 
 
 	@Override
 	protected void setup(Context context) throws IOException, InterruptedException {

@@ -15,11 +15,15 @@ package pactBatchKmeans;
 import java.io.Serializable;
 import java.util.Iterator;
 
+import org.apache.mahout.math.RandomAccessSparseVector;
+import org.apache.mahout.math.Vector;
+
 import eu.stratosphere.api.java.record.functions.ReduceFunction;
 import eu.stratosphere.api.java.record.functions.FunctionAnnotation.ConstantFields;
 import eu.stratosphere.api.java.record.operators.ReduceOperator.Combinable;
 import eu.stratosphere.types.IntValue;
 import eu.stratosphere.types.Record;
+import eu.stratosphere.types.StringValue;
 import eu.stratosphere.util.Collector;
 
 /**
@@ -31,36 +35,52 @@ import eu.stratosphere.util.Collector;
  * 0: clusterID
  * 1: clusterVector
  */
+
 @Combinable
 @ConstantFields(0)
 public class RecomputeClusterCenter extends ReduceFunction implements Serializable {
 	private static final long serialVersionUID = 1L;
-	
+
 	private final IntValue count = new IntValue();
-	
+
 	/**
 	 * Compute the new position (coordinate vector) of a cluster center.
 	 */
+
+
 	@Override
 	public void reduce(Iterator<Record> dataPoints, Collector<Record> out) {
 		Record next = null;
-			
+		//	/	System.out.println("Reaching Reduce");
 		// initialize coordinate vector sum and count
-		CoordVector coordinates = new CoordVector();
+		PactVector coordinates = null;
 		double[] coordinateSum = null;
 		int count = 0;	
 
 		// compute coordinate vector sum and count
 		while (dataPoints.hasNext()) {
 			next = dataPoints.next();
-			
+
 			// get the coordinates and the count from the record
-			double[] thisCoords = next.getField(1, CoordVector.class).getCoordinates();
+			PactVector x = next.getField(1, PactVector.class);
+
+			Vector coord=x.getValue();
+			double[] thisCoords = new double[coord.size()];
+			for(int i=1;i<coord.size();i++)
+				thisCoords[i] = coord.get(i); 
+
+
 			int thisCount = next.getField(2, IntValue.class).getValue();
-			
+
 			if (coordinateSum == null) {
-				if (coordinates.getCoordinates() != null) {
-					coordinateSum = coordinates.getCoordinates();
+
+				if (coordinates!=null) {
+
+					//	coordinateSum = coordinates.getCoordinates();
+					Vector coords=coordinates.getValue();
+					coordinateSum=new double[coords.size()];
+					for(int i=1;i<coords.size();i++)
+						coordinateSum[i] = coords.get(i); 
 				}
 				else {
 					coordinateSum = new double[thisCoords.length];
@@ -72,14 +92,28 @@ public class RecomputeClusterCenter extends ReduceFunction implements Serializab
 		}
 
 		// compute new coordinate vector (position) of cluster center
-		for (int i = 0; i < coordinateSum.length; i++) {
+		for (int i = 1; i < coordinateSum.length; i++) {
 			coordinateSum[i] /= count;
 		}
-		
-		coordinates.setCoordinates(coordinateSum);
-		next.setField(1, coordinates);
-		next.setNull(2);
+		Vector newcoordinates = new RandomAccessSparseVector(5);
+		int centerid=next.getField(0, IntValue.class).getValue();
+		StringBuffer x=new StringBuffer();
+		x.append(centerid+" ");
+		for(int i=1;i<coordinateSum.length;i++)
+		{
+			newcoordinates.set(i, coordinateSum[i]); 
+			x.append(i+":"+coordinateSum[i]+" ");
+		}
 
+
+		coordinates=new PactVector(newcoordinates);
+		StringValue coordString=new StringValue(x);
+
+		next.setField(0, coordString);
+
+		//next.setNull(2);
+
+		//	System.out.println("next"+next.getField(1, StringValue.class)+next.getField(0, IntValue.class));
 		// emit new position of cluster center
 		out.collect(next);
 	}
@@ -89,41 +123,61 @@ public class RecomputeClusterCenter extends ReduceFunction implements Serializab
 	 */
 	@Override
 	public void combine(Iterator<Record> dataPoints, Collector<Record> out) {
-		
+
 		Record next = null;
-		
+		//		System.out.println("Reaching Combine");
 		// initialize coordinate vector sum and count
-		CoordVector coordinates = new CoordVector();
+		PactVector coordinates = null;
 		double[] coordinateSum = null;
 		int count = 0;	
-
+		double[] thisCoords = null;
 		// compute coordinate vector sum and count
 		while (dataPoints.hasNext()) {
 			next = dataPoints.next();
-			
+
 			// get the coordinates and the count from the record
-			double[] thisCoords = next.getField(1, CoordVector.class).getCoordinates();
+			PactVector x=next.getField(1, PactVector.class);
+			Vector coord=x.getValue();
+			thisCoords=new double[coord.size()];
+			for(int i=1;i<coord.size();i++)
+				thisCoords[i] = coord.get(i); 
+
+			//	System.out.println("thiscoords "+ thisCoords.length );
+
 			int thisCount = next.getField(2, IntValue.class).getValue();
-			
+
 			if (coordinateSum == null) {
-				if (coordinates.getCoordinates() != null) {
-					coordinateSum = coordinates.getCoordinates();
+
+				if (coordinates!=null) {
+
+
+					//	coordinateSum = coordinates.getCoordinates();
+					Vector coords=coordinates.getValue();
+					coordinateSum=new double[coords.size()];
+					for(int i=1;i<coords.size();i++)
+						coordinateSum[i] = coords.get(i); 
 				}
 				else {
+
 					coordinateSum = new double[thisCoords.length];
 				}
 			}
-
 			addToCoordVector(coordinateSum, thisCoords);
 			count += thisCount;
 		}
-		
-		coordinates.setCoordinates(coordinateSum);
+
+
+		Vector newcoordinates = new RandomAccessSparseVector(5);
+
+		for(int i=1;i<coordinateSum.length;i++)
+			newcoordinates.set(i, coordinateSum[i]); 
+		coordinates=new PactVector(newcoordinates);
 		this.count.setValue(count);
 		next.setField(1, coordinates);
 		next.setField(2, this.count);
-		
+
 		// emit partial sum and partial count for average computation
+
 		out.collect(next);
 	}
 
@@ -138,6 +192,7 @@ public class RecomputeClusterCenter extends ReduceFunction implements Serializab
 	 *        This vector is not modified.
 	 */
 	private void addToCoordVector(double[] cvToAddTo, double[] cvToBeAdded) {
+
 		// check if both vectors have same length
 		if (cvToAddTo.length != cvToBeAdded.length) {
 			throw new IllegalArgumentException("The given coordinate vectors are not of equal length.");

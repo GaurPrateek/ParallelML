@@ -2,6 +2,7 @@ package mapredLocalLogreg;
 
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.mahout.common.IntPairWritable;
@@ -12,7 +13,7 @@ import Utils.AbstractHadoopJob;
 
 public class EvalJob extends AbstractHadoopJob {
 
-  private static String JOB_NAME = "aim3-validation";
+  private static String JOB_NAME = "local-logreg-validation";
   
   static final String CONF_KEY_TRAIN_OUTPUT = "train-output";
   static final String CONF_KEY_LABEL_DIMENSION = "label-dimension";

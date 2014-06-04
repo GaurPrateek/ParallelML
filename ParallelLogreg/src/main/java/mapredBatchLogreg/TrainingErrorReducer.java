@@ -10,6 +10,8 @@ import org.apache.log4j.Logger;
 
 import Utils.AdaptiveLogger;
 
+
+
 public class TrainingErrorReducer extends
     Reducer<NullWritable, DoubleWritable, NullWritable, DoubleWritable> {
 

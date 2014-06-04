@@ -99,7 +99,7 @@ public class EnsembleJob implements Program, ProgramDescription {
       .field(IntValue.class, 0)
       .field(IntValue.class, 1)
       .field(IntValue.class, 2);
-    } else {    // if (runValidation)
+    } else {    // if (!runValidation)
       
       out = new FileDataSink(CsvOutputFormat.class, outputPath, reduceCombineModel, "Ensemble Models");
       CsvOutputFormat.configureRecordFormat(out)

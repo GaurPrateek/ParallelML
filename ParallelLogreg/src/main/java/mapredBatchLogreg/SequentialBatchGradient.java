@@ -13,7 +13,7 @@ import org.apache.mahout.math.Vector;
 import org.apache.mahout.math.VectorWritable;
 import org.apache.mahout.math.function.Functions;
 
-import Utils.IDAndLabels;
+import Utils.id.IDAndLabels;
 import de.tuberlin.dima.ml.logreg.LogRegMath;
 import de.tuberlin.dima.ml.validation.OnlineAccuracy;
 

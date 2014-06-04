@@ -15,11 +15,12 @@ import org.apache.mahout.math.RandomAccessSparseVector;
 import org.apache.mahout.math.Vector;
 import org.apache.mahout.math.VectorWritable;
 
+import Utils.id.IDAndLabels;
+
 import com.google.common.collect.Lists;
 import com.google.common.io.Closeables;
 
 import de.tuberlin.dima.ml.inputreader.RCV1VectorReader;
-
 import de.tuberlin.dima.ml.util.MLUtils;
 
 public class RCV1ToSeqMultiLabel {

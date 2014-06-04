@@ -33,7 +33,7 @@ public class FindNearestCenter extends ReduceFunction implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	private final IntValue centerId = new IntValue();
-	private final CoordVector position = new CoordVector();
+	private final PactVector position = new PactVector();
 	private final IntValue one = new IntValue(1);
 	
 	private final Record result = new Record(3);
@@ -52,6 +52,7 @@ public class FindNearestCenter extends ReduceFunction implements Serializable {
 		double nearestDistance = Double.MAX_VALUE;
 		int nearestClusterId = 0;
 
+		
 		// check all cluster centers
 		while (pointsWithDistance.hasNext()) {
 			Record res = pointsWithDistance.next();
@@ -73,7 +74,10 @@ public class FindNearestCenter extends ReduceFunction implements Serializable {
 		this.result.setField(0, this.centerId);
 		this.result.setField(1, this.position);
 		this.result.setField(2, this.one);
-			
+	System.out.println("sizes "+this.position.getValue().get(4));
+		System.out.println("record:"+ this.result.getField(0,IntValue.class)+"," 
+			+this.result.getField(1,PactVector.class)+","+this.result.getField(2, IntValue.class));
+		
 		out.collect(this.result);
 	}
 
@@ -89,6 +93,7 @@ public class FindNearestCenter extends ReduceFunction implements Serializable {
 	public void combine(Iterator<Record> pointsWithDistance, Collector<Record> out) {
 		double nearestDistance = Double.MAX_VALUE;
 
+		
 		// check all cluster centers
 		while (pointsWithDistance.hasNext()) {
 			Record res = pointsWithDistance.next();

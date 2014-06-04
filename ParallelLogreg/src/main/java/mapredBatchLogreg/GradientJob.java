@@ -4,7 +4,9 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.mahout.math.SequentialAccessSparseVector;
 import org.apache.mahout.math.Vector;
 import org.apache.mahout.math.VectorWritable;
@@ -19,7 +21,7 @@ import Utils.HadoopUtils;
  */
 public class GradientJob extends AbstractHadoopJob {
 
-  private static String JOB_NAME = "aim3-gradient";
+  private static String JOB_NAME = "Batch-Gradient-Test";
 
   static final int REDUCE_TASKS = 1;
 
@@ -48,7 +50,7 @@ public class GradientJob extends AbstractHadoopJob {
   }
 
   public int run(String[] args) throws Exception {
-
+	  System.out.println("Janani is here");
     Job job = prepareJob(
         JOB_NAME, 
         REDUCE_TASKS, 
@@ -58,7 +60,7 @@ public class GradientJob extends AbstractHadoopJob {
         VectorWritable.class,
         NullWritable.class,
         VectorWritable.class,
-        SequenceFileInputFormat.class,
+        TextInputFormat.class,
         SequenceFileOutputFormat.class,
         inputFile,
         outputPath);

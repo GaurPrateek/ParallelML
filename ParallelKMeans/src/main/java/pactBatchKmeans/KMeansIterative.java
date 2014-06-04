@@ -19,15 +19,17 @@ import eu.stratosphere.api.common.ProgramDescription;
 import eu.stratosphere.api.common.operators.BulkIteration;
 import eu.stratosphere.api.common.operators.FileDataSink;
 import eu.stratosphere.api.common.operators.FileDataSource;
+import eu.stratosphere.api.java.record.io.CsvOutputFormat;
+import eu.stratosphere.api.java.record.io.TextInputFormat;
 import eu.stratosphere.api.java.record.operators.CrossOperator;
 import eu.stratosphere.api.java.record.operators.ReduceOperator;
-
 import eu.stratosphere.types.IntValue;
+import eu.stratosphere.types.StringValue;
 
 
 public class KMeansIterative implements Program, ProgramDescription {
-	
-	
+
+
 	public Plan getPlan(String... args) {
 		// parse job parameters
 		final int numSubTasks = (args.length > 0 ? Integer.parseInt(args[0]) : 1);
@@ -37,15 +39,16 @@ public class KMeansIterative implements Program, ProgramDescription {
 		final int numIterations = (args.length > 4 ? Integer.parseInt(args[4]) : 1);
 
 		// create DataSourceContract for cluster center input
-		FileDataSource initialClusterPoints = new FileDataSource(new PointInFormat(), clusterInput, "Centers");
+		FileDataSource initialClusterPoints = new FileDataSource(new TextInputFormat(), clusterInput, "Centers");
 		initialClusterPoints.setDegreeOfParallelism(1);
-		
+
 		BulkIteration iteration = new BulkIteration("K-Means Loop");
 		iteration.setInput(initialClusterPoints);
 		iteration.setMaximumNumberOfIterations(numIterations);
-		
+
 		// create DataSourceContract for data point input
-		FileDataSource dataPoints = new FileDataSource(new PointInFormat(), dataPointInput, "Data Points");
+		FileDataSource dataPoints = new FileDataSource(new TextInputFormat(), dataPointInput, "Data Points");
+
 
 		// create CrossOperator for distance computation
 		CrossOperator computeDistance = CrossOperator.builder(new ComputeDistance())
@@ -54,6 +57,7 @@ public class KMeansIterative implements Program, ProgramDescription {
 				.name("Compute Distances")
 				.build();
 
+		System.out.println("looping through");
 		// create ReduceOperator for finding the nearest cluster centers
 		ReduceOperator findNearestClusterCenters = ReduceOperator.builder(new FindNearestCenter(), IntValue.class, 0)
 				.input(computeDistance)
@@ -68,15 +72,19 @@ public class KMeansIterative implements Program, ProgramDescription {
 		iteration.setNextPartialSolution(recomputeClusterCenter);
 
 		// create DataSinkContract for writing the new cluster positions
-		FileDataSink finalResult = new FileDataSink(new PointOutFormat(), output, iteration, "New Center Positions");
-
+		FileDataSink finalResult = new FileDataSink(new CsvOutputFormat(), output, iteration, "New Center Positions");
+		CsvOutputFormat.configureRecordFormat(finalResult)
+		.recordDelimiter('\n')
+		.fieldDelimiter(' ')
+		//.field(IntValue.class, 1) 
+		.field(StringValue.class, 0); 
 		// return the PACT plan
 		Plan plan = new Plan(finalResult, "Iterative KMeans");
 		plan.setDefaultParallelism(numSubTasks);
 		return plan;
 	}
 
-	
+
 	public String getDescription() {
 		return "Parameters: <numSubStasks> <dataPoints> <clusterCenters> <output> <numIterations>";
 	}
